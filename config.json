@@ -1,0 +1,7 @@
+{
+  "aes_mode": "CBC",
+  "aes_key_bytes": 32,
+  "aes_iv_bytes": 16,
+  "hmac_key_bytes": 32,
+  "hash_algorithm": "SHA-256"
+}
