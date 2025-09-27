@@ -23,28 +23,43 @@
 
 using namespace CryptoPP;
 
-
 // ---------------- Helper functions ------------------
 
-// Performs a constant-time comparison of two strings to prevent timing attacks.
-// Returns true if the strings are equal, false otherwise.
+/**
+ * @brief Performs a constant-time comparison of two strings to prevent timing attacks.
+ *
+ * @param a First string to compare.
+ * @param b Second string to compare.
+ * @return true if the strings are equal, false otherwise.
+ */
 static bool constantTimeEqual(const std::string &a, const std::string &b) {
     if (a.size() != b.size()) return false;
     unsigned char diff = 0;
     for (size_t i = 0; i < a.size(); ++i) 
-        diff |= ((unsigned char)a[i] ^ (unsigned char)b[i]); // accumulate differences
+        diff |= ((unsigned char)a[i] ^ (unsigned char)b[i]); ///< Accumulate differences
     return diff == 0;
 }
 
-// Computes the HMAC-SHA256 of the given data using the provided HMAC key.
-// Returns the raw binary MAC (32 bytes).
+
+/**
+ * @brief Computes the HMAC-SHA256 of the given data using the provided HMAC key.
+ *
+ * @param data Input data to be authenticated.
+ * @param hmacKey The secret HMAC key used for generating the MAC.
+ * @return The raw binary Message Authentication Code (MAC) of 32 bytes.
+ */
 static std::string computeHmacSha256(const QByteArray &data, const SecByteBlock &hmacKey) {
     std::string mac;
-    HMAC<SHA256> h((const byte*)hmacKey.BytePtr(), hmacKey.size());  // initialize HMAC
-    StringSource ss((const byte*)data.constData(), data.size(), true,
-                    new HashFilter(h, new StringSink(mac)));          // compute HMAC
-    return mac; // raw binary MAC
+    HMAC<SHA256> h((const byte*)hmacKey.BytePtr(), hmacKey.size()); ///< Initialize HMAC with key
+    StringSource ss(
+        (const byte*)data.constData(), 
+        data.size(), 
+        true,
+        new HashFilter(h, new StringSink(mac)) ///< Compute HMAC and write result to sink
+    );
+    return mac; ///< Return raw binary MAC (32 bytes)
 }
+
 
 
 // ---------- MainWindow implementation ----------
@@ -108,75 +123,101 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 
-// Updates the status label in the GUI with the given message.
+/**
+ * @brief Updates the status label in the GUI with the given message.
+ *
+ * @param s The status message to display.
+ */
 void MainWindow::setStatus(const QString& s) {
     statusLabel->setText(s);
 }
 
 
-// Loads cryptographic configuration from "config.json".
-// If the file doesn't exist or is invalid, uses default values.
+
+/**
+ * @brief Loads cryptographic configuration from "config.json".
+ *
+ * If the file doesn't exist or is invalid, default values are used instead.
+ */
 void MainWindow::loadConfig() {
     QFile f("config.json");
-    if (!f.open(QFile::ReadOnly)) {                // try to open config file
+    if (!f.open(QFile::ReadOnly)) { ///< Try to open config file
         setStatus("Could not open config.json — using defaults");
-        return;                                    // use defaults if file missing
+        return; ///< Use defaults if file missing
     }
 
-    QByteArray data = f.readAll();                // read entire file
-    QJsonDocument doc = QJsonDocument::fromJson(data);  // parse JSON
-    if (!doc.isObject()) {                         // check if valid JSON object
+    QByteArray data = f.readAll(); ///< Read entire file
+    QJsonDocument doc = QJsonDocument::fromJson(data); ///< Parse JSON
+    if (!doc.isObject()) { ///< Check if valid JSON object
         setStatus("config.json invalid — using defaults");
-        return;                                    // use defaults if invalid
+        return; ///< Use defaults if invalid
     }
 
     QJsonObject obj = doc.object();
-    // read config values, provide defaults if missing
+    ///< Read config values, provide defaults if missing
     aesKeyBytes   = obj.value("aes_key_bytes").toInt(32);
     aesIvBytes    = obj.value("aes_iv_bytes").toInt(16);
     hmacKeyBytes  = obj.value("hmac_key_bytes").toInt(32);
 }
 
 
-// Reads the entire contents of the specified file into a QByteArray.
-// Returns true if successful, false if the file could not be opened.
+/**
+ * @brief Reads the entire contents of the specified file into a QByteArray.
+ *
+ * @param path The path to the file to be read.
+ * @param out Reference to a QByteArray where the file contents will be stored.
+ * @return true if the file was successfully opened and read, false otherwise.
+ */
 bool MainWindow::readFileToByteArray(const QString& path, QByteArray& out) {
     QFile f(path);
-    if (!f.open(QFile::ReadOnly)) return false;  // try to open file for reading
-    out = f.readAll();                            // read all data into QByteArray
-    return true;                                  // success
+    if (!f.open(QFile::ReadOnly)) return false; ///< Try to open file for reading
+    out = f.readAll(); ///< Read all data into QByteArray
+    return true; ///< Success
 }
 
 
-// Writes a QByteArray to the specified file path.
-// Returns true if the entire data was successfully written, false otherwise.
+/**
+ * @brief Writes a QByteArray to the specified file path.
+ *
+ * @param path The path of the file where the data will be written.
+ * @param data The QByteArray containing the data to write.
+ * @return true if the entire data was successfully written, false otherwise.
+ */
 bool MainWindow::writeByteArrayToFile(const QString& path, const QByteArray& data) {
     QFile f(path);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) return false;  // open file for writing
-    qint64 written = f.write(data);  // write all bytes
-    f.close();                        // close file
-    return (written == data.size());  // check if full data was written
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) return false; ///< Open file for writing
+    qint64 written = f.write(data); ///< Write all bytes
+    f.close(); ///< Close file
+    return (written == data.size()); ///< Check if full data was written
 }
 
 
-// Opens a file dialog for the user to select a file, 
-// stores the path, resets progress/output, and updates status
+/**
+ * @brief Opens a file dialog for the user to select a file.
+ *
+ * Stores the selected file path, resets progress and output, and updates the status label.
+ */
 void MainWindow::onUpload() {
     QString file = QFileDialog::getOpenFileName(this, "Open file");
-    if (file.isEmpty()) return;  // user canceled
+    if (file.isEmpty()) return; ///< User canceled
+
     inputFilePath = file;
     setStatus(QString("Selected: %1").arg(file));
-    progressBar->setValue(0);    // reset progress bar
-    outputText->clear();          // clear previous output
-    processedData.clear();        // clear any previous processed data
-    lastOutputIsText = false;     // reset output type
-    lastTextOutput.clear();       // clear last text output
-    lastAction = LastAction::None; // reset last action
+    progressBar->setValue(0); ///< Reset progress bar
+    outputText->clear(); ///< Clear previous output
+    processedData.clear(); ///< Clear any previously processed data
+    lastOutputIsText = false; ///< Reset output type
+    lastTextOutput.clear(); ///< Clear last text output
+    lastAction = LastAction::None; ///< Reset last action
 }
 
 
-// Generates a new random symmetric AES key and HMAC key, 
-// displays them in the GUI in hex format, and updates internal state
+/**
+ * @brief Generates a new random symmetric AES key and HMAC key.
+ *
+ * Displays the generated keys in the GUI (in hex format), updates internal state,
+ * and shows a status message.
+ */
 void MainWindow::onGenerateKey() {
     AutoSeededRandomPool rng;
 
@@ -214,17 +255,28 @@ void MainWindow::onGenerateKey() {
 }
 
 
-// Saves the last generated key pair or processed output to a file,
-// using an appropriate suggested filename/extension based on the operation.
+
+/**
+ * @brief Saves the last generated key pair or processed output to a file.
+ *
+ * Uses an appropriate suggested filename/extension depending on the last operation:
+ * - If the last action was key generation, saves symmetric and HMAC keys as `.keypair.hex`.
+ * - Otherwise, saves processed binary or text output with a relevant extension
+ *   (e.g., `.aescbc`, `.sha256`, `.hmac`, `.txt`, `.bin`).
+ */
 void MainWindow::onDownload() {
     // Case 1: last action was key generation
     if (lastAction == LastAction::GeneratedKey) {
-        // Suggest filename based on input file or default "keypair"
-        QString base = QFileInfo(inputFilePath).completeBaseName();
+        QString base = QFileInfo(inputFilePath).completeBaseName(); ///< Suggest filename based on input
         if (base.isEmpty()) base = "keypair";
         QString suggested = base + ".keypair.hex";
-        QString file = QFileDialog::getSaveFileName(this, "Save key pair", suggested, "Key pair (*.keypair.hex);;All Files (*)");
-        if (file.isEmpty()) return; // user canceled
+        QString file = QFileDialog::getSaveFileName(
+            this,
+            "Save key pair",
+            suggested,
+            "Key pair (*.keypair.hex);;All Files (*)"
+        );
+        if (file.isEmpty()) return; ///< User canceled
 
         // Write keys to file
         QFile f(file);
@@ -247,7 +299,7 @@ void MainWindow::onDownload() {
         return;
     }
 
-    // Determine suggested filename and extension based on current operation
+    // Determine suggested filename and extension based on operation
     QString baseName = QFileInfo(inputFilePath).completeBaseName();
     if (baseName.isEmpty()) baseName = "output";
     QString op = opCombo->currentText();
@@ -259,17 +311,19 @@ void MainWindow::onDownload() {
     else suggestedExt = (lastOutputIsText ? ".txt" : ".bin");
 
     QString defaultName = baseName;
-    if (!defaultName.endsWith(suggestedExt, Qt::CaseInsensitive)) defaultName += suggestedExt;
+    if (!defaultName.endsWith(suggestedExt, Qt::CaseInsensitive))
+        defaultName += suggestedExt;
 
     QString file = QFileDialog::getSaveFileName(this, "Save output", defaultName, "All Files (*)");
-    if (file.isEmpty()) return; // user canceled
+    if (file.isEmpty()) return; ///< User canceled
 
     // Ensure text outputs have .txt extension if missing
-    if (lastOutputIsText && QFileInfo(file).suffix().isEmpty()) file += ".txt";
+    if (lastOutputIsText && QFileInfo(file).suffix().isEmpty())
+        file += ".txt";
 
     // Save processed binary or text data
     if (!processedData.isEmpty()) {
-        if (lastOutputIsText) { // text output
+        if (lastOutputIsText) { ///< Text output
             QFile f(file);
             if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
                 setStatus("Failed to save text output");
@@ -282,14 +336,14 @@ void MainWindow::onDownload() {
             QMessageBox::information(this, "Saved", "Text output saved.");
             return;
         }
-        // binary output
+        // Binary output
         if (!writeByteArrayToFile(file, processedData)) {
             setStatus("Failed to save output file");
             return;
         }
         setStatus(QString("Saved %1").arg(file));
         QMessageBox::information(this, "Saved", "Output file saved.");
-    } else { // fallback: write outputText content
+    } else { ///< Fallback: save from outputText
         QFile f(file);
         if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             setStatus("Failed to save text output");
@@ -301,6 +355,7 @@ void MainWindow::onDownload() {
         QMessageBox::information(this, "Saved", "Text output saved.");
     }
 }
+
 
 // Processes the input file or text according to the selected operation in the GUI.
 // Supports AES encryption/decryption, SHA-256 hashing, and HMAC-SHA256.
