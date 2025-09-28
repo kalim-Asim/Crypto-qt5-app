@@ -109,10 +109,13 @@ Once the project is built, you can run the executable from the build directory. 
   
 ## 📸 Screenshots
 1. UI of App
-  <img width="1920" height="1080" alt="Screenshot 2025-09-12 212342" src="https://github.com/user-attachments/assets/9b171157-773b-4538-a4e6-340ea956d7f3" />
+  <img width="735" height="608" alt="Screenshot 2025-09-28 160357" src="https://github.com/user-attachments/assets/16c515c9-cb3a-41c8-b261-4849a447acf5" />
+
 
 2. Dropdown menu
-  <img width="732" height="207" alt="Screenshot 2025-09-12 212356" src="https://github.com/user-attachments/assets/dec44c42-3cdb-429a-9174-1bf9f47641b6" />
+  <img width="731" height="247" alt="Screenshot 2025-09-28 160408" src="https://github.com/user-attachments/assets/b31ea7ed-8562-4a83-9a3b-6849a7021322" />
+
 
 3. Upload file
-  <img width="733" height="640" alt="Screenshot 2025-09-12 212412" src="https://github.com/user-attachments/assets/e2494cd1-2bfd-46fa-a0ea-e2d7c3adfb5b" />
+  <img width="743" height="624" alt="Screenshot 2025-09-28 160418" src="https://github.com/user-attachments/assets/cf751da8-b198-4428-b466-2121a584d1fe" />
+
