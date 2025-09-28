@@ -66,9 +66,15 @@ The project is built using **CMake**. You will need to have CMake and a C++ comp
   ```bash
    mkdir build && cd build
    cmake ..
-   cmake --build . --config Release
+   cmake --build .
    ./CryptoQtApp
    ```
+
+--Windows
+ ```bash
+ cmake --build . --config Release
+ ```
+
 - If using Qt6 adjust CMake find_package to Qt6 and install `qt6-base-dev`.
   
 ## ⚙️ Usage
