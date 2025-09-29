@@ -265,7 +265,11 @@ void MainWindow::onDownload() {
     // Case 1: last action was key generation
     if (lastAction == LastAction::GeneratedKey) {
         QString base = QFileInfo(inputFilePath).completeBaseName(); ///< Suggest filename based on input
-        if (base.isEmpty()) base = "keypair";
+        
+        if (base.isEmpty()) {
+            base = "keypair";
+        }
+
         QString suggested = base + ".keypair.hex";
         QString file = QFileDialog::getSaveFileName(
             this,
@@ -281,10 +285,12 @@ void MainWindow::onDownload() {
             setStatus("Failed to save key pair");
             return;
         }
+
         QTextStream out(&f);
         out << "symmetric_key_hex:" << (lastGeneratedSymKeyHex.isEmpty() ? keyHexEdit->text() : lastGeneratedSymKeyHex) << "\n";
         out << "hmac_key_hex:" << (lastGeneratedHmacKeyHex.isEmpty() ? hmacKeyEdit->text() : lastGeneratedHmacKeyHex) << "\n";
         f.close();
+
         setStatus(QString("Saved key pair %1").arg(file));
         QMessageBox::information(this, "Saved", "Key pair saved.");
         return;
@@ -322,9 +328,13 @@ void MainWindow::onDownload() {
     }
         
 
-    QString file = QFileDialog::getSaveFileName(this, "Save output", defaultName, "All Files (*)");
-    if (file.isEmpty()) 
-        return; ///< User canceled
+    QString file = QFileDialog::getSaveFileName(
+        this, 
+        "Save output", 
+        defaultName, 
+        "All Files (*)"
+    );
+    if (file.isEmpty()) return; ///< User canceled
 
     // Ensure text outputs have .txt extension if missing
     if (lastOutputIsText && QFileInfo(file).suffix().isEmpty())
@@ -351,7 +361,11 @@ void MainWindow::onDownload() {
             return;
         }
         setStatus(QString("Saved %1").arg(file));
-        QMessageBox::information(this, "Saved", "Output file saved.");
+        QMessageBox::information(
+            this, 
+            "Saved", 
+            "Output file saved."
+        );
     } else { ///< Fallback: save from outputText
         QFile f(file);
         if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
@@ -361,7 +375,11 @@ void MainWindow::onDownload() {
         f.write(outputText->toPlainText().toUtf8());
         f.close();
         setStatus(QString("Saved text %1").arg(file));
-        QMessageBox::information(this, "Saved", "Text output saved.");
+        QMessageBox::information(
+            this, 
+            "Saved", 
+            "Text output saved."
+        );
     }
 }
 
