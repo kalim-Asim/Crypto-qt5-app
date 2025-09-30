@@ -31,8 +31,7 @@ CryptoQtApp/
 ├── src/
 │   ├── main.cpp
 │   ├── mainwindow.h
-│   ├── mainwindow.cpp
-│   └── resources.qrc
+│   └── mainwindow.cpp
 └── build/
 ```
 
