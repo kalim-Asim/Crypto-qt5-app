@@ -429,8 +429,15 @@ void MainWindow::onProcess() {
             std::string ciphertext;
             CBC_Mode<AES>::Encryption e;
             e.SetKeyWithIV(key, key.size(), iv, iv.size());
-            StringSource ss2((const byte*)inputData.constData(), inputData.size(), true,
-                new StreamTransformationFilter(e, new StringSink(ciphertext), StreamTransformationFilter::PKCS_PADDING)
+            StringSource ss2(
+                (const byte*)inputData.constData(), 
+                inputData.size(), 
+                true,
+                new StreamTransformationFilter(
+                    e, 
+                    new StringSink(ciphertext), 
+                    StreamTransformationFilter::PKCS_PADDING
+                )
             );
 
             // Build processedData = IV || ciphertext  (NO HMAC appended)

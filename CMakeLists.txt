@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Use Qt5 (you have Qt 5.15.x installed)
+# Use Qt5 
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
 # Try to find Crypto++ via pkg-config or fallback to linking -lcryptopp
@@ -27,7 +27,7 @@ elseif(CRYPTOPP_FOUND)
   link_libraries(${CRYPTOPP_LIBRARIES})
   set(CRYPTOPP_TARGET ${CRYPTOPP_LIBRARIES})
 else()
-  # fallback (common on many distros)
+  # fallback 
   set(CRYPTOPP_TARGET cryptopp)
 endif()
 

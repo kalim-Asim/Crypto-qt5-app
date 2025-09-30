@@ -37,7 +37,6 @@ private:
     QLineEdit* keyHexEdit;   // show symmetric key in hex
     QLineEdit* hmacKeyEdit;  // hmac key in hex (optional)
 
-
     QString inputFilePath;
     QByteArray processedData;
 

@@ -27,7 +27,6 @@ The application provides a simple and intuitive graphical user interface with th
 CryptoQtApp/
 ├── CMakeLists.txt
 ├── config.json
-├── data.hmac
 ├── README.md
 ├── src/
 │   ├── main.cpp
@@ -43,7 +42,6 @@ CryptoQtApp/
 *   **`src/main.cpp`**: The main entry point of the application.
 *   **`src/`**: Contains the Qt-based graphical user interface code.
     *   `mainWindow.h`, `mainWindow.cpp` define the main window of the application.
-*   **`data.hmac`**: Stores the HMAC digest of application data to ensure integrity and authenticity.
 *   **`config.json`**: Configuration file for the application.
 *   **`CMakeLists.txt`**: The build script for the project. -->
 
